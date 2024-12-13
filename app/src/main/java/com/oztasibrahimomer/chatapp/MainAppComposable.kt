@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.oztasibrahimomer.chatapp.feature.auth.SignInScreen
+import com.oztasibrahimomer.chatapp.feature.auth.signIn.SignInScreen
 
 
 @Composable
