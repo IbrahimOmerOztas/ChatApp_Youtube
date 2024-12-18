@@ -7,7 +7,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseAuth
 import com.oztasibrahimomer.chatapp.feature.auth.signIn.SignInScreen
+import com.oztasibrahimomer.chatapp.feature.home.HomeScreen
+import javax.inject.Inject
 
 
 @Composable
@@ -16,13 +19,21 @@ fun MainApp() {
     Surface(
         modifier=Modifier.fillMaxSize()
     ){
+        val currentuser= FirebaseAuth.getInstance().currentUser
         val navController = rememberNavController()
+        val start = if(currentuser!=null) "home" else "login"
 
-        NavHost(navController = navController, startDestination = "login"){
+        NavHost(navController = navController, startDestination = start){
 
             composable("login"){
                 SignInScreen(navController)
             }
+            composable("home"){
+                HomeScreen(navController = navController)
+            }
+
+
+
 
         }
 

@@ -1,6 +1,7 @@
 package com.oztasibrahimomer.chatapp.feature.auth.signIn
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 
@@ -16,22 +17,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -49,6 +50,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.oztasibrahimomer.chatapp.R
 import com.oztasibrahimomer.chatapp.feature.auth.signUp.SignUpDialog
@@ -57,18 +59,39 @@ import com.oztasibrahimomer.chatapp.feature.auth.signUp.SignUpDialog
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SignInScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel:SignInViewModel = hiltViewModel()
+
 ) {
+
+
+    val state = viewModel.state.collectAsState()
+    val context = LocalContext.current
 
     var email by remember{ mutableStateOf("") }
     var password by remember{ mutableStateOf("") }
 
-    val signUpDialog = remember{ mutableStateOf(false) }
+    val signUpDialog = remember{ mutableStateOf(false)}
 
 
     if(signUpDialog.value){
 
-       SignUpDialog()
+       SignUpDialog(signUpDialog,context)
+    }
+
+    LaunchedEffect(state.value){
+        when(state.value){
+            SignInState.Error -> {
+                Toast.makeText(context,"Error",Toast.LENGTH_SHORT).show()
+
+            }
+            SignInState.Success -> {
+                navController.navigate("home")
+
+            }
+            else->{}
+        }
+
     }
 
     Scaffold(
@@ -151,26 +174,38 @@ fun SignInScreen(
                 Spacer(modifier = Modifier.height(15.dp))
 
 
-
-                Button(
-                    onClick = { /*TODO*/ },
-                    colors = ButtonDefaults.buttonColors(Color(0xFF5C8AFE)),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 45.dp)
-
-
-                ) {
-
-                    Text(
-                        text = "Login",
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        textAlign = TextAlign.Center
-                    )
-
+                if(state.value == SignInState.Loading){
+                    CircularProgressIndicator()
                 }
+                else{
+                    Button(
+                        onClick = {
+                            viewModel.signIn(email,password)
+
+
+                        },
+                        enabled = email.isNotEmpty() && password.isNotEmpty() ,
+
+                        colors = ButtonDefaults.buttonColors(Color(0xFF5C8AFE)),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 45.dp)
+
+
+                    ) {
+
+                        Text(
+                            text = "Login",
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            fontSize = 18.sp,
+                            textAlign = TextAlign.Center
+                        )
+
+                    }
+                }
+
+
                 Spacer(modifier = Modifier.height(15.dp))
 
                 Row(
