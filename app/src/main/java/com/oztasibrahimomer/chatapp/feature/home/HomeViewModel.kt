@@ -1,8 +1,9 @@
 package com.oztasibrahimomer.chatapp.feature.home
 
+
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.google.firebase.database.FirebaseDatabase
-
 import com.oztasibrahimomer.chatapp.model.Channel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,5 +36,19 @@ class HomeViewModel @Inject constructor(
         }
 
 
+    }
+
+    fun addChannel(name:String){
+        val key = firebaseDatabase.getReference("channel").push().key
+
+
+        firebaseDatabase.getReference("channel").child(key!!).setValue(name).addOnSuccessListener {
+
+            getChannels()
+
+
+        }.addOnSuccessListener {
+
+        }
     }
 }
