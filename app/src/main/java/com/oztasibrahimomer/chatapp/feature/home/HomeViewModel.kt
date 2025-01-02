@@ -1,18 +1,20 @@
 package com.oztasibrahimomer.chatapp.feature.home
 
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.oztasibrahimomer.chatapp.model.Channel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
+import kotlin.random.Random
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val firebaseDatabase: FirebaseDatabase
+    private val firebaseDatabase: FirebaseDatabase,
+    private val auth: FirebaseAuth
 ) : ViewModel() {
 
     private val _channels = MutableStateFlow<List<Channel>>(emptyList())
@@ -39,6 +41,8 @@ class HomeViewModel @Inject constructor(
     }
 
     fun addChannel(name:String){
+        //val randomNumber = generateUniqueDigitNumber()
+        //val key = name.replace(" ","_")+randomNumber
         val key = firebaseDatabase.getReference("channel").push().key
 
 
@@ -51,4 +55,16 @@ class HomeViewModel @Inject constructor(
 
         }
     }
+
+
+    fun exitApp(){
+
+        auth.signOut()
+
+    }
+
+
+    /*private fun generateUniqueDigitNumber(): Int {
+        return Random.nextInt(100000, 1000000) // 100.000 ile 999.999 arasında sayı üretir
+    }*/
 }
